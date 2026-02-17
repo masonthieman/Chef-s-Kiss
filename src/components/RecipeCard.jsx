@@ -4,9 +4,19 @@ import { useState } from 'react';
 import './RecipeCard.module.css';
 
 const RecipeCard = ({recipe}) => {
+    const navigate = useNavigate();
+
+    // Navigate to recipe details page upon clicking any part of recipe card
+    const handleClick = () => {
+        navigate(`/recipes/:${recipe.id}`)
+    }
 
     return (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div onClick={handleClick} 
+        className="bg-white rounded-lg shadow-md overflow-hidden
+                    cursor-pointer
+                    hover:shadow-xl hover:scale-105
+                    transition-all duration-300">
             <img 
             src={recipe.imageUrl}
             alt={recipe.name}

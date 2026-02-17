@@ -6,23 +6,20 @@ import { recipeService } from '../services/recipeService';
 const RecipeList = () => {
     const [recipes, setRecipes] = useState([]);
     
-    
-
+    // Fetch all recipes in database upon mounting the recipe list component
     useEffect(() => {
         const fetchRecipes = async () => {
-            
             try {
                 const recipeData = await recipeService.getAllRecipes()
                 setRecipes(recipeData);
             } catch (error) {
                 console.error("Failed to fetch recipes", error)
             }
-            
         }
         fetchRecipes();
     },[]);
     
-    console.log(recipes);
+    // Map through all returned recipes and create a recipe card out of each recipe
     return (
         <div className="flex justify-evenly">
             {recipes.map((recipe) => (
