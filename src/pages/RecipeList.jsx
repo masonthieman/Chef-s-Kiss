@@ -24,7 +24,7 @@ const RecipeList = () => {
     
     console.log(recipes);
     return (
-        <div>
+        <div className="flex justify-evenly">
             {recipes.map((recipe) => (
                     <RecipeCard key={recipe.id} recipe={recipe} />
                 
