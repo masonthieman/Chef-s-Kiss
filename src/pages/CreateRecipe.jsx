@@ -48,14 +48,19 @@ const CreateRecipe = () => {
     }));
   };
   const handleIngredientChange = (value, index) => {
-    setRecipeData((prev) => ({
-      ...prev,
-      ingredients: [
-        ...prev.ingredients[(0, index)],
-        value,
-        ...prev.ingredients[index + 1],
-      ],
-    }));
+      setRecipeData((prev) => ({
+        ...prev,
+        ingredients: [
+          ...prev.ingredients.map((ingredient, i) => {
+            if (index === i) {
+                return value
+            } 
+            else {
+                return ingredient;
+            }
+          }),
+        ],
+      }));
   };
 
   const handleSubmit = (e) => {};
@@ -141,31 +146,32 @@ const CreateRecipe = () => {
             <label className="block font-bold mb-2" htmlFor="ingredientsList">
               Ingredients
             </label>
-            
+
             {recipeData.ingredients.map((ingredient, index) => (
                 
-              <div>
-                
+              <div key={index}>
                 <input
-                  key={index}
+
                   name="ingredients"
                   type="text"
-                  onChange={handleIngredientChange(ingredient, index)}
+                  onChange={(e) =>
+                    handleIngredientChange(e.target.value, index)
+                  }
                   value={recipeData.ingredients[index]}
                   placeholder="e.g., 2 cups of flour"
                 />
+                <button onClick={() => removeIngredient(index)}>Remove</button>
+              </div>
                 
-             </div>
             ))}
-            
-            </div>
           </div>
+        </div>
         <button onClick={addIngredient}>+ Add Ingredient</button>
-        
+
         <div>
-        <button type="submit" onClick={handleSubmit}>
-          Submit
-        </button>
+          <button type="submit" onClick={handleSubmit}>
+            Submit
+          </button>
         </div>
       </form>
     </>
