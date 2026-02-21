@@ -20,7 +20,7 @@ const CreateRecipe = () => {
   });
 
   const handleChange = (e) => {
-    // Extract the text value and field name from component upon input
+    // Extract the text value and field name from basic component upon input
     const value = e.target.value;
     const key = e.target.name;
 
@@ -31,36 +31,36 @@ const CreateRecipe = () => {
     }));
   };
 
-  const addIngredient = () => {
+  // Renders the first empty element of an array of input fields
+  const addListItem = (key) => {
     setRecipeData((prev) => ({
       ...prev,
-      ingredients: [...prev.ingredients, ""],
+      [key]: [...prev[key], ""],
     }));
   };
 
-  const removeIngredient = (index) => {
+  // Removes the element of the specified list at index
+  const removeItem = (key, index) => {
     setRecipeData((prev) => ({
       ...prev,
-      ingredients: [
-        ...prev.ingredients.slice(0, index),
-        ...prev.ingredients.slice(index + 1),
-      ],
+      [key]: [...prev[key].slice(0, index), ...prev[key].slice(index + 1)],
     }));
   };
-  const handleIngredientChange = (value, index) => {
-      setRecipeData((prev) => ({
-        ...prev,
-        ingredients: [
-          ...prev.ingredients.map((ingredient, i) => {
-            if (index === i) {
-                return value
-            } 
-            else {
-                return ingredient;
-            }
-          }),
-        ],
-      }));
+
+  // Watches the user's input as they update the list
+  const handleItemChange = (key, value, index) => {
+    setRecipeData((prev) => ({
+      ...prev,
+      [key]: [
+        ...prev[key].map((item, i) => {
+          if (index === i) {
+            return value;
+          } else {
+            return item;
+          }
+        }),
+      ],
+    }));
   };
 
   const handleSubmit = (e) => {};
@@ -146,28 +146,49 @@ const CreateRecipe = () => {
             <label className="block font-bold mb-2" htmlFor="ingredientsList">
               Ingredients
             </label>
-
             {recipeData.ingredients.map((ingredient, index) => (
-                
               <div key={index}>
                 <input
-
                   name="ingredients"
                   type="text"
                   onChange={(e) =>
-                    handleIngredientChange(e.target.value, index)
+                    handleItemChange("ingredients", e.target.value, index)
                   }
                   value={recipeData.ingredients[index]}
                   placeholder="e.g., 2 cups of flour"
                 />
-                <button onClick={() => removeIngredient(index)}>Remove</button>
+                <button onClick={() => removeItem("ingredients", index)}>
+                  Remove
+                </button>
               </div>
-                
             ))}
           </div>
         </div>
-        <button onClick={addIngredient}>+ Add Ingredient</button>
-
+        <button onClick={() => addListItem("ingredients")}>
+          + Add Ingredient
+        </button>
+        <div className="mb-6">
+          <label className="block font-bold mb-2" htmlFor="instructionsList">
+            Instructions
+          </label>
+          {recipeData.instructions.map((instruction, index) => (
+            <div key={index}>
+              <h1>{index + 1}. </h1>
+              <input
+                name="instructions"
+                type="text"
+                onChange={(e) =>
+                  handleItemChange("instructions", e.target.value, index)
+                }
+                value={instruction}
+              />
+              <button onClick={() => removeItem("instructions", index)}>
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+        <button onClick={() => addListItem("instructions")}>+ Add Step</button>
         <div>
           <button type="submit" onClick={handleSubmit}>
             Submit
