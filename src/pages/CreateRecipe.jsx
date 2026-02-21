@@ -188,7 +188,37 @@ const CreateRecipe = () => {
             </div>
           ))}
         </div>
-        <button onClick={() => addListItem("instructions")}>+ Add Step</button>
+        <button onClick={() => addListItem("tags")}>+ Add Step</button>
+         <div className="mb-6">
+          <label className="block font-bold mb-2" htmlFor="tagsList">
+            Tags
+          </label>
+          {recipeData.tags.map((tag, index) => (
+            <div key={index}>
+              <input
+                name="tagsList"
+                type="text"
+                onChange={(e) =>
+                  handleItemChange("tags", e.target.value, index)
+                }
+                value={tag}
+              />
+              <button onClick={() => removeItem("tags", index)}>
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+        <button onClick={() => addListItem("tags")}>+ Add Tag</button>
+        <div>
+            <label htmlFor="imageURL">Image URL: </label>
+            <input
+                id="imageUrl"
+                onChange={handleChange}
+                type="text"
+                name="imageURL"
+            />
+        </div>
         <div>
           <button type="submit" onClick={handleSubmit}>
             Submit
