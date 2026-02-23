@@ -78,6 +78,8 @@ const CreateRecipe = () => {
     const result = await recipeService.createRecipe(recipeData)
 
     // If an id is provided by Firestore when returned in the result then the POST was sucessful
+    // Gemini thought this result was a promise with a success property when it returns the submitted recipeData
+    // object. Firestore returns it with a newly generated id if successful.
     if (result.id) {
       alert("Recipe created successfully");
       navigate("/");
@@ -138,7 +140,7 @@ const CreateRecipe = () => {
             type="number"
             name="servings"
           />
-
+          <div>
           <label htmlFor="difficultyInput">Difficulty: </label>
           <input
             name="difficulty"
@@ -149,6 +151,8 @@ const CreateRecipe = () => {
             type="radio"
           />
           <label htmlFor="difficultyEasy">Easy</label>
+          </div>
+          <div>
           <input
             name="difficulty"
             value="Medium"
@@ -158,6 +162,8 @@ const CreateRecipe = () => {
             type="radio"
           />
           <label htmlFor="difficultyMedium">Medium</label>
+          </div>
+          <div>
           <input
             name="difficulty"
             value="Hard"
@@ -167,6 +173,7 @@ const CreateRecipe = () => {
             type="radio"
           />
           <label htmlFor="difficultyHard">Hard</label>
+          </div>
           <div className="mb-6">
             <label className="block font-bold mb-2" htmlFor="ingredientsList">
               Ingredients
@@ -236,7 +243,7 @@ const CreateRecipe = () => {
         </div>
         <button type="button" onClick={() => addListItem("tags")}>+ Add Tag</button>
         <div>
-            <label htmlFor="imageURL">Image URL: </label>
+            <label htmlFor="imageUrl">Image URL: </label>
             <input
                 id="imageUrl"
                 onChange={handleChange}
