@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import RecipeCard from "../components/RecipeCard";
+import { recipeService } from '../services/recipeService'
 const CreateRecipe = () => {
   const navigate = useNavigate();
   const [recipeData, setRecipeData] = useState({
@@ -51,26 +52,48 @@ const CreateRecipe = () => {
   const handleItemChange = (key, value, index) => {
     setRecipeData((prev) => ({
       ...prev,
-      [key]: [
-        ...prev[key].map((item, i) => {
+      [key]: 
+        prev[key].map((item, i) => {
           if (index === i) {
             return value;
           } else {
             return item;
           }
         }),
-      ],
+      
     }));
   };
 
-  const handleSubmit = (e) => {};
+  // Click button to submit the recipe form 
+  // This function was developed by Google Gemini
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    // If the name field of recipe form has no value alert the user and prevent submission
+    if (!recipeData.name.trim()) {
+      alert("Please enter a recipe name");
+      return;
+    }
+    
+    const result = await recipeService.createRecipe(recipeData)
+
+    // If an id is provided by Firestore when returned in the result then the POST was sucessful
+    if (result.id) {
+      alert("Recipe created successfully");
+      navigate("/");
+    }
+    else {
+      alert("Failed to create recipe: " + result.error);
+    }
+
+
+  };
 
   return (
     <>
       <h1 className="text-3xl font-bold mb-6">Create New Recipe</h1>
-      <p>Recipe form will go here...</p>
 
-      <form className="max-w-2xl mx-auto p-6">
+      <form onSubmit={handleSubmit} className="max-w-2xl mx-auto p-6">
         <div className="mb-4">
           <div className="mb-4">
             <label className="block font-bold mb-2" htmlFor="name">
@@ -82,7 +105,6 @@ const CreateRecipe = () => {
               onChange={handleChange}
               type="text"
               name="name"
-              required
             />
           </div>
           <label htmlFor="descriptionInput">Description: </label>
@@ -121,6 +143,7 @@ const CreateRecipe = () => {
           <input
             name="difficulty"
             value="Easy"
+            checked={recipeData.difficulty === "Easy"}
             id="difficultyEasy"
             onChange={handleChange}
             type="radio"
@@ -129,6 +152,7 @@ const CreateRecipe = () => {
           <input
             name="difficulty"
             value="Medium"
+            checked={recipeData.difficulty === "Medium"}
             id="difficultyMedium"
             onChange={handleChange}
             type="radio"
@@ -137,6 +161,7 @@ const CreateRecipe = () => {
           <input
             name="difficulty"
             value="Hard"
+            checked={recipeData.difficulty === "Hard"}
             id="difficultyHard"
             onChange={handleChange}
             type="radio"
@@ -157,14 +182,14 @@ const CreateRecipe = () => {
                   value={recipeData.ingredients[index]}
                   placeholder="e.g., 2 cups of flour"
                 />
-                <button onClick={() => removeItem("ingredients", index)}>
+                <button type="button" onClick={() => removeItem("ingredients", index)}>
                   Remove
                 </button>
               </div>
             ))}
           </div>
         </div>
-        <button onClick={() => addListItem("ingredients")}>
+        <button type="button" onClick={() => addListItem("ingredients")}>
           + Add Ingredient
         </button>
         <div className="mb-6">
@@ -182,13 +207,13 @@ const CreateRecipe = () => {
                 }
                 value={instruction}
               />
-              <button onClick={() => removeItem("instructions", index)}>
+              <button type="button" onClick={() => removeItem("instructions", index)}>
                 Remove
               </button>
             </div>
           ))}
         </div>
-        <button onClick={() => addListItem("tags")}>+ Add Step</button>
+        <button type="button" onClick={() => addListItem("instructions")}>+ Add Step</button>
          <div className="mb-6">
           <label className="block font-bold mb-2" htmlFor="tagsList">
             Tags
@@ -203,24 +228,24 @@ const CreateRecipe = () => {
                 }
                 value={tag}
               />
-              <button onClick={() => removeItem("tags", index)}>
+              <button type="button" onClick={() => removeItem("tags", index)}>
                 Remove
               </button>
             </div>
           ))}
         </div>
-        <button onClick={() => addListItem("tags")}>+ Add Tag</button>
+        <button type="button" onClick={() => addListItem("tags")}>+ Add Tag</button>
         <div>
             <label htmlFor="imageURL">Image URL: </label>
             <input
                 id="imageUrl"
                 onChange={handleChange}
                 type="text"
-                name="imageURL"
+                name="imageUrl"
             />
         </div>
         <div>
-          <button type="submit" onClick={handleSubmit}>
+          <button type="submit">
             Submit
           </button>
         </div>
