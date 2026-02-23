@@ -1,10 +1,264 @@
-function CreateRecipe() {
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import RecipeCard from "../components/RecipeCard";
+import { recipeService } from '../services/recipeService'
+const CreateRecipe = () => {
+  const navigate = useNavigate();
+  const [recipeData, setRecipeData] = useState({
+    name: "",
+    cookTime: 0,
+    category: "",
+    createdAt: "",
+    description: "",
+    difficulty: "Medium",
+    imageUrl: "",
+    ingredients: [],
+    instructions: [],
+    prepTime: 0,
+    servings: 0,
+    tags: [],
+  });
+
+  const handleChange = (e) => {
+    // Extract the text value and field name from basic component upon input
+    const value = e.target.value;
+    const key = e.target.name;
+
+    // Create a new state out of existing recipe data then set recipe data state to modified new state
+    setRecipeData((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  // Renders the first empty element of an array of input fields
+  const addListItem = (key) => {
+    setRecipeData((prev) => ({
+      ...prev,
+      [key]: [...prev[key], ""],
+    }));
+  };
+
+  // Removes the element of the specified list at index
+  const removeItem = (key, index) => {
+    setRecipeData((prev) => ({
+      ...prev,
+      [key]: [...prev[key].slice(0, index), ...prev[key].slice(index + 1)],
+    }));
+  };
+
+  // Watches the user's input as they update the list
+  const handleItemChange = (key, value, index) => {
+    setRecipeData((prev) => ({
+      ...prev,
+      [key]: 
+        prev[key].map((item, i) => {
+          if (index === i) {
+            return value;
+          } else {
+            return item;
+          }
+        }),
+      
+    }));
+  };
+
+  // Click button to submit the recipe form 
+  // This function was developed by Google Gemini
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    // If the name field of recipe form has no value alert the user and prevent submission
+    if (!recipeData.name.trim()) {
+      alert("Please enter a recipe name");
+      return;
+    }
+    
+    const result = await recipeService.createRecipe(recipeData)
+
+    // If an id is provided by Firestore when returned in the result then the POST was sucessful
+    // Gemini thought this result was a promise with a success property when it returns the submitted recipeData
+    // object. Firestore returns it with a newly generated id if successful.
+    if (result.id) {
+      alert("Recipe created successfully");
+      navigate("/");
+    }
+    else {
+      alert("Failed to create recipe: " + result.error);
+    }
+
+
+  };
+
   return (
-    <div>
+    <>
       <h1 className="text-3xl font-bold mb-6">Create New Recipe</h1>
-      <p>Recipe form will go here...</p>
-    </div>
+
+      <form onSubmit={handleSubmit} className="max-w-2xl mx-auto p-6">
+        <div className="mb-4">
+          <div className="mb-4">
+            <label className="block font-bold mb-2" htmlFor="name">
+              Name:{" "}
+            </label>
+            <input
+              className="w-full px-4 py-2 border rounded-lg"
+              id="nameInput"
+              onChange={handleChange}
+              type="text"
+              name="name"
+            />
+          </div>
+          <label htmlFor="descriptionInput">Description: </label>
+          <input
+            id="descriptionInput"
+            onChange={handleChange}
+            type="text"
+            name="description"
+          />
+
+          <label htmlFor="prepInput">Prep Time: </label>
+          <input
+            id="prepInput"
+            onChange={handleChange}
+            type="number"
+            name="prepTime"
+          />
+
+          <label htmlFor="cookInput">Cook Time: </label>
+          <input
+            id="cookInput"
+            onChange={handleChange}
+            type="number"
+            name="cookTime"
+          />
+
+          <label htmlFor="servingsInput">Servings: </label>
+          <input
+            id="servingsInput"
+            onChange={handleChange}
+            type="number"
+            name="servings"
+          />
+          <div>
+          <label htmlFor="difficultyInput">Difficulty: </label>
+          <input
+            name="difficulty"
+            value="Easy"
+            checked={recipeData.difficulty === "Easy"}
+            id="difficultyEasy"
+            onChange={handleChange}
+            type="radio"
+          />
+          <label htmlFor="difficultyEasy">Easy</label>
+          </div>
+          <div>
+          <input
+            name="difficulty"
+            value="Medium"
+            checked={recipeData.difficulty === "Medium"}
+            id="difficultyMedium"
+            onChange={handleChange}
+            type="radio"
+          />
+          <label htmlFor="difficultyMedium">Medium</label>
+          </div>
+          <div>
+          <input
+            name="difficulty"
+            value="Hard"
+            checked={recipeData.difficulty === "Hard"}
+            id="difficultyHard"
+            onChange={handleChange}
+            type="radio"
+          />
+          <label htmlFor="difficultyHard">Hard</label>
+          </div>
+          <div className="mb-6">
+            <label className="block font-bold mb-2" htmlFor="ingredientsList">
+              Ingredients
+            </label>
+            {recipeData.ingredients.map((ingredient, index) => (
+              <div key={index}>
+                <input
+                  name="ingredients"
+                  type="text"
+                  onChange={(e) =>
+                    handleItemChange("ingredients", e.target.value, index)
+                  }
+                  value={recipeData.ingredients[index]}
+                  placeholder="e.g., 2 cups of flour"
+                />
+                <button type="button" onClick={() => removeItem("ingredients", index)}>
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+        <button type="button" onClick={() => addListItem("ingredients")}>
+          + Add Ingredient
+        </button>
+        <div className="mb-6">
+          <label className="block font-bold mb-2" htmlFor="instructionsList">
+            Instructions
+          </label>
+          {recipeData.instructions.map((instruction, index) => (
+            <div key={index}>
+              <h1>{index + 1}. </h1>
+              <input
+                name="instructions"
+                type="text"
+                onChange={(e) =>
+                  handleItemChange("instructions", e.target.value, index)
+                }
+                value={instruction}
+              />
+              <button type="button" onClick={() => removeItem("instructions", index)}>
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+        <button type="button" onClick={() => addListItem("instructions")}>+ Add Step</button>
+         <div className="mb-6">
+          <label className="block font-bold mb-2" htmlFor="tagsList">
+            Tags
+          </label>
+          {recipeData.tags.map((tag, index) => (
+            <div key={index}>
+              <input
+                name="tagsList"
+                type="text"
+                onChange={(e) =>
+                  handleItemChange("tags", e.target.value, index)
+                }
+                value={tag}
+              />
+              <button type="button" onClick={() => removeItem("tags", index)}>
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+        <button type="button" onClick={() => addListItem("tags")}>+ Add Tag</button>
+        <div>
+            <label htmlFor="imageUrl">Image URL: </label>
+            <input
+                id="imageUrl"
+                onChange={handleChange}
+                type="text"
+                name="imageUrl"
+            />
+        </div>
+        <div>
+          <button type="submit">
+            Submit
+          </button>
+        </div>
+      </form>
+    </>
   );
-}
+};
 
 export default CreateRecipe;
